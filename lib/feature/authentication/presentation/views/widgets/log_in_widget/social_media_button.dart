@@ -27,7 +27,7 @@ class SocialMediaButtons extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
-              icon: Icon(Icons.accessibility_sharp),
+              icon: Image.asset("asset/image/image.png"),
               onPressed: isLoading
                   ? null
                   : () {
