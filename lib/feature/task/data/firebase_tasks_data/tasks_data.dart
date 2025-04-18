@@ -7,21 +7,21 @@ class TaskService {
   Future<List<TaskFireBaseModel>> getTasksFromFirebase( {String? progress}) async {
     List<TaskFireBaseModel> tasks = [];
 
-    Query query = FirebaseFirestore.instance.collection("tasks")
-        .where("id", isEqualTo: FirebaseAuth.instance.currentUser!.uid);
+    // Query query = FirebaseFirestore.instance.collection("tasks")
+    //     .where("id", isEqualTo: FirebaseAuth.instance.currentUser!.uid);
 
-    if (progress != null) {
-      query = query.where("progress", isEqualTo: progress);
-    }
+    // if (progress != null) {
+    //   query = query.where("progress", isEqualTo: progress);
+    // }
 
-    QuerySnapshot snapshot = await query.get();
+    // QuerySnapshot snapshot = await query.get() ;
 
-    for (var doc in snapshot.docs) {
-      TaskFireBaseModel task = TaskFireBaseModel.fromJson(
-          doc.data() as Map<String, dynamic>, doc.id);
+    // for (var doc in snapshot.docs) {
+    //   TaskFireBaseModel task = TaskFireBaseModel.fromJson(
+    //       doc.data() as Map<String, dynamic>, doc.id);
 
-      tasks.add(task);
-    }
+    //   tasks.add(task);
+    // }
 
     return tasks;
   }
