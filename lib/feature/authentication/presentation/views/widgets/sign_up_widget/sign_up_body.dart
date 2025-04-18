@@ -156,7 +156,8 @@ class _SignUpBodyState extends State<SignUpBody> {
                     hintText: 'Choose experience Level',
                     textStyle: Styles.text8,
                     iconColor: ColorStyle.color5,
-                    Controller: levelController, width: 326,
+                    Controller: levelController,
+                    width: 326,
                   ),
                   if (levelError)
                     Padding(
@@ -168,8 +169,8 @@ class _SignUpBodyState extends State<SignUpBody> {
                               .colorScheme
                               .error, // استخدام نفس اللون الافتراضي للخطأ
                           fontSize: 12.0, // حجم النص الافتراضي لرسالة الخطأ
-                          fontWeight:
-                          FontWeight.normal, // محاذاة نفس وزن الخط الافتراضي
+                          fontWeight: FontWeight
+                              .normal, // محاذاة نفس وزن الخط الافتراضي
                         ),
                       ),
                     ),
@@ -243,39 +244,72 @@ class _SignUpBodyState extends State<SignUpBody> {
                     height: 20,
                   ),
                   CustomButton(
-                    text: "Sign up",
-                    image: null,
-                    onPressed: () async {
-                      setState(() {
-                        levelError = levelController.text.isEmpty;
-                      });
-                      if (formKey.currentState!.validate() && !levelError) {
-                        try {
-                          UserCredential userCredential = await FirebaseAuth
-                              .instance
-                              .createUserWithEmailAndPassword(
-                                  email: emailController.text,
-                                  password: passwordController.text);
-                          await AuthManager().saveUserData(
-                              name: nameController.text,
-                              email: emailController.text,
-                              experience:
-                                  int.tryParse(yearsOfExperienceController.text),
-                              level: levelController.text,
-                              address: addressController.text,
-                              password: passwordController.text);
-                          if (userCredential.user != null) {
-                            await AuthManager().saveUidToSharedPreference(
-                                userCredential.user!.uid);
-                            GoRouter.of(context).push(AppRouter.taskHomeScreen);
+                      text: "Sign up",
+                      image: null,
+                      onPressed: () async {
+                        setState(() {
+                          levelError = levelController.text.isEmpty;
+                        });
+                        if (formKey.currentState!.validate() && !levelError) {
+                          try {
+                            UserCredential userCredential = await FirebaseAuth
+                                .instance
+                                .createUserWithEmailAndPassword(
+                                    email: emailController.text,
+                                    password: passwordController.text);
+
+                            // حفظ بيانات المستخدم بعد التسجيل
+                            await AuthManager().saveUserData(
+                                name: nameController.text,
+                                email: emailController.text,
+                                experience: int.tryParse(
+                                    yearsOfExperienceController.text),
+                                level: levelController.text,
+                                address: addressController.text,
+                                password: passwordController.text);
+
+                            if (userCredential.user != null) {
+                              // حفظ UID المستخدم في SharedPreferences
+                              await AuthManager().saveUidToSharedPreference(
+                                  userCredential.user!.uid);
+                              SnackBar(
+                                content: Text('You have successfully Signed Up!',style: TextStyle(color: Colors.white),),
+                                backgroundColor: Colors.green,
+                              );
+
+                              GoRouter.of(context)
+                                  .push(AppRouter.taskHomeScreen);
+                            }
+                          } on FirebaseAuthException catch (e) {
+                            String errorMessage;
+
+                            // التحقق من الكود الخاص بخطأ "البريد الإلكتروني موجود بالفعل"
+                            if (e.code == 'email-already-in-use') {
+                              errorMessage =
+                                  'البريد الإلكتروني مستخدم بالفعل. الرجاء اختيار بريد إلكتروني آخر.';
+                            } else {
+                              errorMessage = 'حدث خطأ: ${e.message}';
+                            }
+
+                            // عرض رسالة الخطأ في SnackBar
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(errorMessage),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          } catch (e) {
+                            // معالجة أي أخطاء أخرى
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content:
+                                    Text('حدث خطأ غير متوقع: ${e.toString()}'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
                           }
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(e.toString())));
                         }
-                      }
-                    },
-                  ),
+                      }),
                   SizedBox(
                     height: 15,
                   ),

@@ -115,14 +115,13 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
                       }
                     : null,
                 items:
-               widget.list != null?
-               widget.list!.map<DropdownMenuItem<String>>((String value) {
+               widget.list?.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Row(
                       children: [
                         Text(value),
-                        SizedBox(
+                       const SizedBox(
                           width: 5,
                         ),
                         widget.rowText != null
@@ -131,7 +130,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
                       ],
                     ),
                   );
-                }).toList():null
+                }).toList()
               ),
             ),
           ),

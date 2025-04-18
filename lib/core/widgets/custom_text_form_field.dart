@@ -10,7 +10,7 @@ import '../../feature/authentication/presentation/views/widgets/custom_phone_num
 class CustomTextFormField extends StatefulWidget {
   CustomTextFormField({
     super.key,
-     this.hintText,
+    this.hintText,
     required this.textInputType,
     required this.height,
     required this.width,

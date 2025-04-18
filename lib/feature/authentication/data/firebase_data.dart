@@ -37,7 +37,12 @@ class AuthManager {
   }
 
   Future<void> signInWithEmailPassword(
-      String email, String password, BuildContext context) async {
+      String email,
+      String password,
+      BuildContext context,
+      Function(
+              {String? generalError, String? emailError, String? passwordError})
+          setError) async {
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -49,11 +54,30 @@ class AuthManager {
       if (user != null) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('uid', user.uid);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('You have successfully logged in!',style: TextStyle(color: Colors.white),),
+            backgroundColor: Colors.green,
+          ),
+        );
         GoRouter.of(context).pushReplacement(AppRouter.taskHomeScreen);
       }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-email') {
+        setError(emailError: 'Email is incorrect.');
+      } else if (e.code == 'wrong-password') {
+        setError(passwordError: 'The password is incorrect.');
+      } else if (e.code == 'user-not-found') {
+        setError(generalError: 'User not found. Please create a new account.');
+      } else {
+        setError(
+            generalError: 'An unexpected error occurred. Please try again.');
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())));    }
+      setError(
+        generalError: 'error occurred: ${e.toString()}',
+      );
+    }
   }
 
   Future saveUserData(

@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:to_do_app/feature/authentication/data/repo/login_repo_implementation.dart';
+import 'package:to_do_app/feature/authentication/presentation/manager/login_cubit.dart';
 import 'package:to_do_app/feature/authentication/presentation/views/log_in_screen.dart';
 import 'package:to_do_app/feature/authentication/presentation/views/sign_up_screen.dart';
 import 'package:to_do_app/feature/splash_screen/presentation/views/let_start_screen.dart';
@@ -20,7 +23,6 @@ abstract class AppRouter {
   static const addTaskScreen = "/AddTaskScreen";
   static const taskDetailsScreen = "/TaskDetailsScreen";
 
-
   static final GoRouter router = GoRouter(routes: <RouteBase>[
     GoRoute(
       path: '/',
@@ -37,7 +39,9 @@ abstract class AppRouter {
     GoRoute(
       path: logInScreen,
       builder: (BuildContext context, GoRouterState state) {
-        return LogInScreen();
+        return BlocProvider(
+            create: (context) => LoginCubit(UserAuthRepoImplementaion()),
+            child: LogInScreen());
       },
     ),
     GoRoute(
@@ -67,7 +71,9 @@ abstract class AppRouter {
     GoRoute(
       path: taskDetailsScreen,
       builder: (BuildContext context, GoRouterState state) {
-        return TaskDetailsScreen(taskWidget: state.extra as TaskWidget,);
+        return TaskDetailsScreen(
+          taskWidget: state.extra as TaskWidget,
+        );
       },
     ),
   ]);

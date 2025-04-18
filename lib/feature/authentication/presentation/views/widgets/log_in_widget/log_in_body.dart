@@ -1,11 +1,8 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:to_do_app/core/goRouter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:to_do_app/feature/authentication/data/firebase_data.dart';
+import 'package:to_do_app/feature/authentication/presentation/views/widgets/log_in_widget/social_media_button.dart';
 import '../../../../../../core/assets/colors.dart';
 import '../../../../../../core/assets/images.dart';
 import '../../../../../../core/assets/styles.dart';
@@ -23,10 +20,22 @@ class LogInBody extends StatefulWidget {
 class _LogInBodyState extends State<LogInBody> {
   bool isClick = false;
   var formKey = GlobalKey<FormState>();
+
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   void initState() {
     super.initState();
+  }
+  String? generalErrorMessage;
+  String? emailErrorMessage;
+  String? passwordErrorMessage;
+
+  void setError({String? generalError, String? emailError, String? passwordError}) {
+    setState(() {
+      generalErrorMessage = generalError;
+      emailErrorMessage = emailError;
+      passwordErrorMessage = passwordError;
+    });
   }
 
   @override
@@ -68,6 +77,14 @@ class _LogInBodyState extends State<LogInBody> {
                   SizedBox(
                     height: 15,
                   ),
+                  if (generalErrorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        generalErrorMessage!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
                   CustomTextFormField(
                     hintText: 'Email...',
                     maxLines: 1,
@@ -89,6 +106,14 @@ class _LogInBodyState extends State<LogInBody> {
                       return null;
                     },
                   ),
+                  if (emailErrorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        emailErrorMessage!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
                   SizedBox(
                     height: 10,
                   ),
@@ -132,6 +157,14 @@ class _LogInBodyState extends State<LogInBody> {
                       print(value);
                     },
                   ),
+                  if (passwordErrorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        passwordErrorMessage!,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
                   SizedBox(
                     height: 10,
                   ),
@@ -140,7 +173,14 @@ class _LogInBodyState extends State<LogInBody> {
                     image: null,
                     onPressed: () async {
                       if (formKey.currentState!.validate()) {
-                      await  AuthManager().signInWithEmailPassword(emailController.text, passwordController.text,context);
+                        setError(generalError: null, emailError: null, passwordError: null);
+
+                        await AuthManager().signInWithEmailPassword(
+                            emailController.text,
+                            passwordController.text,
+                            context,
+                            setError
+                        );
                       }
                     },
                   ),
@@ -150,7 +190,8 @@ class _LogInBodyState extends State<LogInBody> {
                   CustomInkwellText(
                       Text1: "Didn’t have any account?",
                       Text2: "Sign Up here",
-                      path: AppRouter.signUpScreen)
+                      path: AppRouter.signUpScreen),
+                      SocialMediaButtons()
                 ],
               ),
             ),
@@ -160,17 +201,3 @@ class _LogInBodyState extends State<LogInBody> {
     );
   }
 }
-/*
-await FirebaseAuth.instance
-                            .signInWithEmailAndPassword(
-                                email: emailController.text,
-                                password: passwordController.text)
-                            .then((value) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Login success")));
-                          GoRouter.of(context).push(AppRouter.taskHomeScreen);
-                        }).catchError((error) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Login Failed")));
-                          print(error.toString());
-                        }); */
